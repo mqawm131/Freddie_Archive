@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جميع التغريدات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 0;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 680px;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .tweet-wrapper {
+            background-color: white;
+            border: 1px solid #cfd9de;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Using the styles from the read file */
+        .tweet-container {
+            font-family: Helvetica, Arial, sans-serif;
+            padding: 12px 16px;
+            border: 1px solid #cfd9de;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: max-content;
+        }
+
+        .tweet-container > #nonjsonview {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tweet-author {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding-bottom: 0.75rem;
+        }
+
+        .tweet-author-profile-image img {
+            width: 48px;
+            max-width: 48px;
+            height: 48px;
+            max-height: 48px;
+            overflow: hidden;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .tweet-author-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tweet-author-name {
+            font-weight: bold;
+        }
+
+        .tweet-content {
+            font-size: 1.25rem;
+            word-wrap: break-word;
+        }
+
+        .tweet-image {
+            width: 100%;
+            height: auto;
+            margin-top: 12px;
+            border-radius: 12px;
+        }
+
+        .embedded-tweet-container {
+            box-sizing: border-box;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid #cfd9de;
+            border-radius: 12px;
+            background-color: white;
+            max-width: 100%;
+        }
+        .date {
+            font-size: 0.75rem;
+            color: #657786;
+            margin-top: 12px;
+        }
+        .date a {
+            color: #657786;
+            text-decoration: none;
+        }
+        .date a:hover {
+            text-decoration: underline;
+        }
+        .json-view {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 600px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .json-view.visible {
+            display: block;
+        }
+        .toggle-json-btn {
+            background-color: #1DA1F2;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .toggle-json-btn:hover {
+            background-color: #0c85d0;
+        }
+        .archive-btn {
+            background-color: #17A2B8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-left: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .archive-btn:hover {
+            background-color: #117A8B;
+        }
+        #search-container {
+            max-width: 680px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 16px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            font-size: 16px;
+        }
+        #search-button, #clear-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #search-button {
+            background-color: #1DA1F2;
+        }
+        #search-button:hover {
+            background-color: #0c85d0;
+        }
+        #clear-button {
+            background-color: #6c757d;
+        }
+        #clear-button:hover {
+            background-color: #5a6268;
+        }
+        #feed {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        
+        /* إضافة تنسيق لحاويات حقول التاريخ */
+        .filter-item {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        
+        /* تأكد من أن التقويم يظهر تحت الحقل مباشرة */
+        .flatpickr-calendar {
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 999 !important;
+            margin-top: 3px !important;
+        }
+        
+        /* أزرار ترتيب التغريدات */
+        .sort-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .sort-button {
+            background-color: #1DA1F2;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+        
+        .sort-button.active {
+            background-color: #0c85d0;
+            font-weight: bold;
+        }
+        
+        .sort-button:hover {
+            background-color: #0c85d0;
+        }
+        
+        /* زر نسخ الرابط */
+        .copy-link-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+        
+        .copy-link-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div style="background: #e0f7fa; color: #006064; border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: center; font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; font-family: 'Amiri', serif;">
+        {وَقُلْ جَاءَ الْحَقُّ وَزَهَقَ الْبَاطِلُ ۚ إِنَّ الْبَاطِلَ كَانَ زَهُوقًا}
+        الإسراء: 81
+    </div>
+    <div style="background: #fff3cd; color: #856404; border-radius: 12px; padding: 12px; margin-bottom: 24px; text-align: center; font-size: 1.05rem; max-width: 600px; border: 1px solid #ffeeba; margin-left: auto; margin-right: auto;">
+        للتواصل لإضافة المزيد من الأرشيفات لملحدين أو إرسال تغريدات ضد هذا الملحد:<br>
+        <a href="https://x.com/mqawm_131" target="_blank" style="color: #0056b3; font-weight: bold; text-decoration: underline;">@mqawm_131</a>
+    </div>
+
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="ابحث في التغريدات...">
+        <button id="search-button">بحث</button>
+        <button id="clear-button">مسح</button>
+    </div>
+    
+    <div class="sort-buttons">
+        <button id="newest-first" class="sort-button active">الأحدث أولاً</button>
+        <button id="oldest-first" class="sort-button">الأقدم أولاً</button>
+    </div>
+
+    <div id="feed"></div>
+    <div id="loader" style="text-align: center; padding: 20px; display: none;">جاري تحميل المزيد...</div>
+
+    <script src="file_list.js"></script>
+    <script src="archive_links.js"></script>
+    <script src="search_index.js"></script>
+    <script>
+        const feed = document.getElementById('feed');
+        const loader = document.getElementById('loader');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const clearButton = document.getElementById('clear-button');
+        const newestFirstButton = document.getElementById('newest-first');
+        const oldestFirstButton = document.getElementById('oldest-first');
+
+        let currentPageIndex = 0;
+        const loadAtOnce = 10;
+
+        let visiblePages = [...pages];
+        let sortNewestFirst = true; // الافتراضي هو عرض الأحدث أولاً
+
+        const sortPages = () => {
+            if (sortNewestFirst) {
+                // ترتيب التغريدات من الأحدث للأقدم (الأرقام الأكبر أولاً)
+                visiblePages.sort((a, b) => {
+                    const idA = parseInt(a.split('.')[0]);
+                    const idB = parseInt(b.split('.')[0]);
+                    return idB - idA;
+                });
+            } else {
+                // ترتيب التغريدات من الأقدم للأحدث (الأرقام الأصغر أولاً)
+                visiblePages.sort((a, b) => {
+                    const idA = parseInt(a.split('.')[0]);
+                    const idB = parseInt(b.split('.')[0]);
+                    return idA - idB;
+                });
+            }
+        };
+
+        const loadNextPages = async () => {
+            if (currentPageIndex >= visiblePages.length) {
+                loader.style.display = 'none';
+                if (feed.innerHTML === '') {
+                   feed.innerHTML = '<p style="text-align:center;">لا توجد تغريدات مطابقة لبحثك.</p>';
+                }
+                return;
+            }
+
+            loader.style.display = 'block';
+
+            const pagesToLoad = visiblePages.slice(currentPageIndex, currentPageIndex + loadAtOnce);
+            currentPageIndex += loadAtOnce;
+
+            for (const pageFile of pagesToLoad) {
+                try {
+                    const response = await fetch(`الصفحات/${pageFile}`);
+                    const htmlText = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    
+                    const tweetContainer = doc.querySelector('.tweet-container.on');
+                    const jsonView = doc.querySelector('#jsonview');
+                    
+                    if (tweetContainer && jsonView) {
+                        // Create a wrapper for each tweet and its JSON
+                        const tweetWrapper = document.createElement('div');
+                        tweetWrapper.className = 'tweet-wrapper';
+
+                        const tweetId = pageFile.split('.')[0];
+
+                        const numberElement = document.createElement('h3');
+                        numberElement.style.textAlign = 'center';
+                        numberElement.textContent = `التغريدة رقم ${tweetId}`;
+                        tweetWrapper.appendChild(numberElement);
+                        
+                        // Add the tweet
+                        tweetWrapper.appendChild(tweetContainer);
+
+                        let dateElement;
+                        try {
+                            const jsonText = jsonView.querySelector('pre').innerText;
+                            const jsonData = JSON.parse(jsonText);
+                            const createdAt = jsonData.data.created_at;
+                            if (createdAt) {
+                                const date = new Date(createdAt);
+                                dateElement = document.createElement('div');
+                                dateElement.className = 'date';
+                                dateElement.style.textAlign = 'right';
+                                dateElement.style.marginTop = '15px';
+                                dateElement.textContent = `تاريخ النشر: ${date.toLocaleString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+                            }
+                        } catch(e) {
+                            console.error('Could not parse JSON or find date for', pageFile, e);
+                        }
+ 
+                         // Add the JSON view (initially hidden)
+                         jsonView.classList.add('json-view');
+                         
+                         const buttonContainer = document.createElement('div');
+                         buttonContainer.style.textAlign = 'center';
+
+                         // Create and add the toggle button
+                         const toggleButton = document.createElement('button');
+                         toggleButton.textContent = 'إظهار/إخفاء JSON';
+                         toggleButton.className = 'toggle-json-btn';
+
+                         // زر نسخ JSON
+                         const copyJsonButton = document.createElement('button');
+                         copyJsonButton.textContent = 'نسخ JSON';
+                         copyJsonButton.className = 'copy-link-btn';
+                         copyJsonButton.style.display = 'none';
+                         copyJsonButton.onclick = () => {
+                             const jsonText = jsonView.querySelector('pre').innerText;
+                             if (navigator.clipboard && window.isSecureContext) {
+                                 navigator.clipboard.writeText(jsonText)
+                                     .then(() => {
+                                         const originalText = copyJsonButton.textContent;
+                                         copyJsonButton.textContent = 'تم النسخ!';
+                                         setTimeout(() => {
+                                             copyJsonButton.textContent = originalText;
+                                         }, 2000);
+                                     })
+                                     .catch(() => {
+                                         alert('حدث خطأ أثناء نسخ JSON');
+                                     });
+                             } else {
+                                 const textArea = document.createElement('textarea');
+                                 textArea.value = jsonText;
+                                 textArea.style.position = 'fixed';
+                                 textArea.style.left = '-999999px';
+                                 document.body.appendChild(textArea);
+                                 textArea.focus();
+                                 textArea.select();
+                                 try {
+                                     document.execCommand('copy');
+                                     const originalText = copyJsonButton.textContent;
+                                     copyJsonButton.textContent = 'تم النسخ!';
+                                     setTimeout(() => {
+                                         copyJsonButton.textContent = originalText;
+                                     }, 2000);
+                                 } catch (err) {
+                                     alert('حدث خطأ أثناء نسخ JSON');
+                                 }
+                                 document.body.removeChild(textArea);
+                             }
+                         };
+
+                         // عند فتح JSON أظهر زر النسخ، وعند إغلاقه أخفِ الزر
+
+                         toggleButton.onclick = () => {
+                             jsonView.classList.toggle('visible');
+                             if (jsonView.classList.contains('visible')) {
+                                 copyJsonButton.style.display = 'inline-block';
+                             } else {
+                                 copyJsonButton.style.display = 'none';
+                             }
+                         };
+                         buttonContainer.appendChild(toggleButton);
+                         buttonContainer.appendChild(copyJsonButton);
+ 
+                         // Add Archive button
+                         const archiveUrl = archiveLinks[tweetId];
+                         if (archiveUrl) {
+                             const archiveButton = document.createElement('a');
+                             archiveButton.href = archiveUrl;
+                             archiveButton.textContent = 'الأرشيف';
+                             archiveButton.className = 'archive-btn';
+                             archiveButton.target = '_blank'; // Open in new tab
+                             buttonContainer.appendChild(archiveButton);
+                             
+                             // إضافة زر نسخ رابط الأرشيف
+                             const copyLinkButton = document.createElement('button');
+                             copyLinkButton.textContent = 'نسخ رابط الأرشيف';
+                             copyLinkButton.className = 'copy-link-btn';
+                             copyLinkButton.onclick = () => {
+                                 // محاولة استخدام Clipboard API
+                                 if (navigator.clipboard && window.isSecureContext) {
+                                     navigator.clipboard.writeText(archiveUrl)
+                                         .then(() => {
+                                             const originalText = copyLinkButton.textContent;
+                                             copyLinkButton.textContent = 'تم النسخ!';
+                                             setTimeout(() => {
+                                                 copyLinkButton.textContent = originalText;
+                                             }, 2000);
+                                         })
+                                         .catch(err => {
+                                             alert('حدث خطأ أثناء محاولة نسخ الرابط');
+                                         });
+                                 } else {
+                                     // طريقة بديلة للمتصفحات القديمة
+                                     const textArea = document.createElement("textarea");
+                                     textArea.value = archiveUrl;
+                                     // تجنب ظهور textarea للمستخدم
+                                     textArea.style.position = "fixed";
+                                     textArea.style.left = "-999999px";
+                                     document.body.appendChild(textArea);
+                                     textArea.focus();
+                                     textArea.select();
+                                     try {
+                                         document.execCommand('copy');
+                                         const originalText = copyLinkButton.textContent;
+                                         copyLinkButton.textContent = 'تم النسخ!';
+                                         setTimeout(() => {
+                                             copyLinkButton.textContent = originalText;
+                                         }, 2000);
+                                     } catch (err) {
+                                         alert('حدث خطأ أثناء محاولة نسخ الرابط');
+                                     }
+                                     document.body.removeChild(textArea);
+                                 }
+                             };
+                             buttonContainer.appendChild(copyLinkButton);
+                         }
+ 
+                         // Append date and buttons after tweet content
+                         if(dateElement) {
+                            tweetContainer.appendChild(dateElement);
+                         }
+                         tweetContainer.appendChild(buttonContainer);
+                         
+                         tweetWrapper.appendChild(jsonView);
+                         feed.appendChild(tweetWrapper);
+                     }
+                 } catch (error) {
+                     console.error(`Error loading page ${pageFile}:`, error);
+                 }
+             }
+
+             loader.style.display = 'none';
+         };
+
+         const performSearch = () => {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            feed.innerHTML = '';
+            currentPageIndex = 0;
+            
+            if (searchTerm === '') {
+                visiblePages = [...pages];
+            } else {
+                const matchingIds = Object.keys(searchIndex).filter(id => 
+                    searchIndex[id].toLowerCase().includes(searchTerm)
+                );
+                
+                visiblePages = pages.filter(pageFile => {
+                    const tweetId = pageFile.split('.')[0];
+                    return matchingIds.includes(tweetId);
+                });
+            }
+            
+            sortPages();
+            loadNextPages();
+        };
+
+        const clearSearch = () => {
+            searchInput.value = '';
+            performSearch();
+        };
+        
+        const changeSortOrder = (newestFirst) => {
+            sortNewestFirst = newestFirst;
+            feed.innerHTML = '';
+            currentPageIndex = 0;
+            
+            // تحديث حالة الأزرار
+            if (newestFirst) {
+                newestFirstButton.classList.add('active');
+                oldestFirstButton.classList.remove('active');
+            } else {
+                newestFirstButton.classList.remove('active');
+                oldestFirstButton.classList.add('active');
+            }
+            
+            sortPages();
+            loadNextPages();
+        };
+
+        searchButton.addEventListener('click', performSearch);
+        clearButton.addEventListener('click', clearSearch);
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // إضافة مستمعي الأحداث لأزرار الترتيب
+        newestFirstButton.addEventListener('click', () => changeSortOrder(true));
+        oldestFirstButton.addEventListener('click', () => changeSortOrder(false));
+
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                loadNextPages();
+            }
+        };
+
+        // Initial load with sorting
+        sortPages();
+        loadNextPages();
+
+        // Listen for scroll
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // Initialize Flatpickr
+        const fpConfig = {
+            locale: "ar",
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            static: true,
+            disableMobile: true
+        };
+
+        flatpickr("#start-date", fpConfig);
+        flatpickr("#end-date", fpConfig);
+
+    </script>
+</body>
+</html> 
